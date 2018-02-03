@@ -1,7 +1,7 @@
 # Polynomial-evaluation-using-Go-language
 **Objective :** Write a program in Go to evaluate a polynomial over given integer points. You are supposed to use concurrency features of Go for this assignment.
 
-**Input format:**
+**Input format:**</br>
 numtestcases</br>
 polydegree</br>
 polycoeff</br>
@@ -36,7 +36,7 @@ Eval3</br>
 
 The output of the program is one evaluation per line with evaluations for different polynomials separated by a line containing ‘#’ without any extra characters. Note that it is guaranteed that the evaluation of the polynomial will not contain more than 1000 digits.
 
-**Example Output:(Given output is not for the input specified earlier.)**</br>
+**Example Output:(Given output is not for the input specified earlier.)**</br></br>
 \#</br>
 34113492349</br>
 223498235923542349</br>
