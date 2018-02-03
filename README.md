@@ -36,7 +36,7 @@ Eval3</br>
 
 The output of the program is one evaluation per line with evaluations for different polynomials separated by a line containing ‘#’ without any extra characters. Note that it is guaranteed that the evaluation of the polynomial will not contain more than 1000 digits.
 
-**Example Output:(Given output is not for the input specified earlier.)**</br></br>
+**Example Output:(Given output is not for the input specified earlier.)**</br>
 \#</br>
 34113492349</br>
 223498235923542349</br>
