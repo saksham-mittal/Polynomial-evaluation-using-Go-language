@@ -16,34 +16,142 @@ func reverse(s string) string {
     return string(runes)
 }
 
-func add(x string, y string) string {
-  if(len(x) > len(y)) {
-    x, y = swap(x, y)
-  }
+func isSmaller(x string, y string) bool {
+    // Calculate lengths of both string
+    n1 := len(x)
+    n2 := len(y)
+
+    if (n1 < n2) {
+       return true
+    }
+    if (n2 < n1) {
+       return false
+    }
+
+    for i := 0; i < n1; i++ {
+       if (x[i] < y[i]) {
+          return true
+      } else if (x[i] > y[i]) {
+          return false
+      }
+    }
+
+    return false
+}
+
+func subtract(y string, x string) string {
+  n1 := len(y)
+  n2 := len(x)
 
   var str string = ""
-  n1 := len(x)
-  n2 := len(y)
-  diff := n2 - n1
+  y = reverse(y)
+  x = reverse(x)
 
   carry := 0
-  for i := n1 - 1; i >= 0; i-- {
-    sum := (int(x[i] - '0') + int(y[i+diff] - '0') + carry);
-    str = str + string(sum % 10 + '0')
-    carry = sum / 10
+  for i := 0; i < n2; i++ {
+    sub := (int(y[i] - '0') - int(x[i] - '0') - carry)
+    if (sub < 0) {
+      sub = sub + 10;
+      carry = 1;
+    } else {
+      carry = 0;
+    }
+
+    str = str + string(sub + '0')
   }
 
-  for i := n2 - n1 - 1; i >= 0; i-- {
-    sum := (int(y[i] - '0') + carry);
-    str = str + string(sum % 10 + '0')
-    carry = sum / 10
+  for i := n2; i < n1; i++ {
+    sub := (int(y[i] - '0') - carry)
+    carry = 0
+    str = str + string(sub + '0')
   }
 
-   if(carry > 0) {
-      str = str + string(carry + '0')
+  str = reverse(str)
+
+  return str
+}
+
+func add(x string, y string) string {
+  var sign int = 0
+  var str string = ""
+
+  if(x == "") {
+    if(y == "") {
+      return str
+    } else {
+      return y
+    }
+  } else {
+    if(y == "") {
+      return x
+    }
+  }
+
+  if(y[0] == '-') {
+    y = y[1 : ]
+    sign = 3
+  }
+
+  if(x[0] == '-') {
+    x = x[1 : ]
+    if(sign == 3) {
+      sign = 2
+    } else {
+      sign = 1
+    }
+  }
+
+  // sign = 0 - both are positive
+  //        1 - only x is negative
+  //        2 - both x and y is negative
+  //        3 - only y is negative
+
+  if(isSmaller(y, x)) {
+    x, y = swap(x, y)
+
+    if(sign == 1) {
+      sign = 3
+    } else if(sign == 3) {
+      sign = 1
+    }
+  }
+
+  if(sign == 0 || sign == 2) {
+    n1 := len(x)
+    n2 := len(y)
+    diff := n2 - n1
+
+    carry := 0
+    for i := n1 - 1; i >= 0; i-- {
+      sum := (int(x[i] - '0') + int(y[i+diff] - '0') + carry);
+      str = str + string(sum % 10 + '0')
+      carry = sum / 10
+    }
+
+    for i := n2 - n1 - 1; i >= 0; i-- {
+      sum := (int(y[i] - '0') + carry);
+      str = str + string(sum % 10 + '0')
+      carry = sum / 10
+    }
+
+     if(carry > 0) {
+        str = str + string(carry + '0')
+     }
+
+     if(sign == 2) {
+       str = str + string('-')
+     }
+
+     str = reverse(str)
+   } else {
+     str = subtract(y, x);
+
+     if(sign == 3) {
+       str = reverse(str)
+       str = str + string('-')
+       str = reverse(str)
+     }
    }
-
-   str = reverse(str)
    return str
 }
 
@@ -76,7 +184,21 @@ func multiplySingleDigit(y byte, x string, count int, c chan string) {
 
 func multiply(x string, y string) string {
   var str string = ""
+  var sign int
 
+  if(y[0] == '-') {
+    y = y[1 : ]
+    // removing - sign if 1st character is '-'
+    sign = 1
+  }
+  if(x[0] == '-') {
+    x = x[1 : ]
+    if(sign == 1) {
+      sign = 0
+    } else {
+      sign = 1
+    }
+  }
   n := len(y)
 
   c := make(chan string, n)
@@ -92,14 +214,25 @@ func multiply(x string, y string) string {
     temp := <- c
     str = add(str, temp)
   }
+
+  if(sign == 1) {
+    // if the product is negative then add - sign at beginning
+    str = reverse(str)
+    str = str + string('-')
+    str = reverse(str)
+  }
   return str
 }
 
 func evaluate(x string, a []string, size int) {
   var temp string
   temp = a[0]
+  // fmt.Println("temp =", temp)
   for i := 1; i <= size; i++ {
-        temp = add(a[i], multiply(x, temp))
+    // fmt.Println("x * temp =", multiply(x, temp))
+    // fmt.Println("a[i] =", a[i])
+    temp = add(a[i], multiply(x, temp))
+    // fmt.Println("a[i] + (x * temp) =", temp)
   }
 
   fmt.Println(temp)
