@@ -2,7 +2,11 @@ package main
 
 import (
   "fmt"
+  "strings"
+  "bufio"
+  "os"
 )
+
 
 func swap(x, y string) (string, string) {
     return y, x
@@ -10,7 +14,7 @@ func swap(x, y string) (string, string) {
 
 func reverse(s string) string {
     runes := []rune(s)
-    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+    for i, j := 0, len(runes) - 1; i < j; i, j = i + 1, j - 1 {
         runes[i], runes[j] = runes[j], runes[i]
     }
     return string(runes)
@@ -247,22 +251,21 @@ func main() {
     fmt.Scanln(&n)
     // n is the degree of polynomial
 
-    var a []string
-    a = make([]string, n + 1)
-    for i := 0; i <= n; i++ {
-      fmt.Scanln(&a[i])
-    }
+    degrees := bufio.NewScanner(os.Stdin)
+    degrees.Scan()
+    line1 := degrees.Text()
+    a := strings.Fields(line1)
     // a[i] are the coefficients of polynomial
 
     fmt.Scanln(&k)
     // k is the number of points we want to evaluate polynimial
 
-    var x []string
-    x = make([]string, k)
-    for i := 0; i < k; i++ {
-      fmt.Scanln(&x[i])
-      // x[i] are the points
+    points := bufio.NewScanner(os.Stdin)
+    points.Scan()
+    line2 := points.Text()
+    x := strings.Fields(line2)
 
+    for i := 0; i < len(x); i++ {
       go evaluate(x[i], a[:], n)
     }
     t--
