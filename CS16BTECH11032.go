@@ -2,9 +2,7 @@ package main
 
 import (
   "fmt"
-  "strings"
-  "bufio"
-  "os"
+  "sync"
 )
 
 
@@ -245,7 +243,8 @@ func multiply(x string, y string) string {
   return str
 }
 
-func evaluate(x string, a []string, size int) {
+func evaluate(x string, a []string, size int, index int, ans []string, nt *sync.WaitGroup) {
+  defer nt.Done()
   var temp string
   temp = a[0]
   // fmt.Println("temp =", temp)
@@ -256,11 +255,12 @@ func evaluate(x string, a []string, size int) {
     // fmt.Println("a[i] + (x * temp) =", temp)
   }
 
-  fmt.Println(temp)
+  ans[index] = temp
 }
 
 func main() {
   var t, n, k int
+  var nt sync.WaitGroup
   fmt.Scanln(&t)
   // t is the number of testcases
 
@@ -268,25 +268,38 @@ func main() {
     fmt.Scanln(&n)
     // n is the degree of polynomial
 
-    degrees := bufio.NewScanner(os.Stdin)
-    degrees.Scan()
-    line1 := degrees.Text()
-    a := strings.Fields(line1)
+    var a []string
+    a = make([]string, n + 1)
+    for i := 0; i <= n; i++ {
+      fmt.Scan(&a[i])
+    }
     // a[i] are the coefficients of polynomial
 
     fmt.Scanln(&k)
+    var answers []string
+    answers = make([]string, k)
     // k is the number of points we want to evaluate polynimial
 
-    points := bufio.NewScanner(os.Stdin)
-    points.Scan()
-    line2 := points.Text()
-    x := strings.Fields(line2)
-
-    for i := 0; i < len(x); i++ {
-      go evaluate(x[i], a[:], n)
+    var x []string
+    x = make([]string, k)
+    for i := 0; i < k; i++ {
+      fmt.Scan(&x[i])
     }
+
+    for i := 0; i < k; i++ {
+      nt.Add(1)
+      go evaluate(x[i], a, n, i, answers, &nt)
+    }
+
+    // This waits till all evaluate calls are done
+    nt.Wait()
+    fmt.Println("#")
+    for i := 0; i <k; i++ {
+      fmt.Println(answers[i])
+    }
+
     t--
   }
-  var input string
-  fmt.Scanln(&input)
+
+  fmt.Println("#")
 }
