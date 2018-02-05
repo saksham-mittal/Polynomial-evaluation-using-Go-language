@@ -46,14 +46,13 @@ func isSmaller(x string, y string) bool {
 func subtract(y string, x string) string {
   n1 := len(y)
   n2 := len(x)
+  diff := n1 - n2
 
   var str string = ""
-  y = reverse(y)
-  x = reverse(x)
 
   carry := 0
-  for i := 0; i < n2; i++ {
-    sub := (int(y[i] - '0') - int(x[i] - '0') - carry)
+  for i := n2 - 1; i >= 0; i-- {
+    sub := (int(y[i + diff] - '0') - int(x[i] - '0') - carry)
     if (sub < 0) {
       sub = sub + 10;
       carry = 1;
@@ -64,13 +63,27 @@ func subtract(y string, x string) string {
     str = str + string(sub + '0')
   }
 
-  for i := n2; i < n1; i++ {
+  for i := n1 - n2 - 1; i >= 0; i-- {
+    if(y[i] == '0' && carry != 0) {
+      str = str + string('9')
+      continue
+    }
     sub := (int(y[i] - '0') - carry)
+    if(i > 0 || sub > 0) {
+      str = str + string(sub + '0')
+    }
     carry = 0
-    str = str + string(sub + '0')
   }
 
   str = reverse(str)
+
+  for i := 0; i < len(str); i++ {
+    if(str[i] == '0' && len(str) > 1) {
+      str = str[i + 1 : ]
+    } else {
+      break
+    }
+  }
 
   return str
 }
@@ -189,6 +202,10 @@ func multiplySingleDigit(y byte, x string, count int, c chan string) {
 func multiply(x string, y string) string {
   var str string = ""
   var sign int
+
+  if(y[0] == '0' || x[0] == '0') {
+    return "0"
+  }
 
   if(y[0] == '-') {
     y = y[1 : ]
